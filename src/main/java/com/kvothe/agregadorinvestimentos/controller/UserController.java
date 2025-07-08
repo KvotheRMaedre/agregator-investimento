@@ -1,33 +1,68 @@
 package com.kvothe.agregadorinvestimentos.controller;
 
-import com.kvothe.agregadorinvestimentos.dto.CreateUserDTO;
+import com.kvothe.agregadorinvestimentos.dto.UserDTO;
 import com.kvothe.agregadorinvestimentos.entity.User;
 import com.kvothe.agregadorinvestimentos.services.UserService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.UUID;
+import java.util.List;
 
 @RestController()
 @RequestMapping("/v1/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody CreateUserDTO request){
+    public ResponseEntity<User> createUser(@RequestBody UserDTO request){
         var userId = userService.createUser(request);
         return ResponseEntity.created(URI.create("/v1/users/" + userId.toString())).build();
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathParam("userId") UUID userId){
-        return null;
+    public ResponseEntity<User> getUserById(@PathVariable("userId") String userId) {
+        try {
+            var user = userService.getUserByID(userId);
+            return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getUserById() {
+        var users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUserById(@PathVariable("userId") String userId){
+        try {
+            userService.deleteUserById(userId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUserById(@PathVariable("userId") String userId,
+                                               @RequestBody UserDTO request) {
+        try {
+            if(userService.userExists(userId)){
+                var user = userService.updateUserById(userId, request);
+                return ResponseEntity.ok(user);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
