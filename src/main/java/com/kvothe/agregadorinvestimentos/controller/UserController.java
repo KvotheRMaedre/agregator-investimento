@@ -1,6 +1,10 @@
 package com.kvothe.agregadorinvestimentos.controller;
 
+import com.kvothe.agregadorinvestimentos.dto.AccountDTO;
+import com.kvothe.agregadorinvestimentos.dto.AccountResponseDTO;
 import com.kvothe.agregadorinvestimentos.dto.UserDTO;
+import com.kvothe.agregadorinvestimentos.entity.Account;
+import com.kvothe.agregadorinvestimentos.entity.BillingAddress;
 import com.kvothe.agregadorinvestimentos.entity.User;
 import com.kvothe.agregadorinvestimentos.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +68,17 @@ public class UserController {
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/{userId}/accounts")
+    public ResponseEntity<BillingAddress> createAccount(@PathVariable String userId, @RequestBody AccountDTO resquest){
+        userService.createAccount(userId, resquest);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/accounts")
+    public ResponseEntity<List<AccountResponseDTO>> getAccount(@PathVariable String userId){
+        var accounts = userService.getAllAccounts(userId);
+        return ResponseEntity.ok(accounts);
     }
 }
