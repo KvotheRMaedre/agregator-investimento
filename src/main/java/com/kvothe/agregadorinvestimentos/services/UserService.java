@@ -3,6 +3,7 @@ package com.kvothe.agregadorinvestimentos.services;
 import com.kvothe.agregadorinvestimentos.dto.AccountDTO;
 import com.kvothe.agregadorinvestimentos.dto.AccountResponseDTO;
 import com.kvothe.agregadorinvestimentos.dto.UserDTO;
+import com.kvothe.agregadorinvestimentos.dto.UserResponseDTO;
 import com.kvothe.agregadorinvestimentos.entity.Account;
 import com.kvothe.agregadorinvestimentos.entity.BillingAddress;
 import com.kvothe.agregadorinvestimentos.entity.User;
@@ -50,8 +51,10 @@ public class UserService {
         return userRepository.findById(UUID.fromString(userId));
     }
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
+    public List<UserResponseDTO> getAllUsers(){
+        var users = userRepository.findAll();
+        return users.stream().map(user ->
+                new UserResponseDTO(user.getId(), user.getName(), user.getEmail())).toList();
     }
 
     public boolean userExists(String userId){

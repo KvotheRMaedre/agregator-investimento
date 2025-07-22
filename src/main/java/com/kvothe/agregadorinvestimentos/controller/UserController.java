@@ -3,6 +3,7 @@ package com.kvothe.agregadorinvestimentos.controller;
 import com.kvothe.agregadorinvestimentos.dto.AccountDTO;
 import com.kvothe.agregadorinvestimentos.dto.AccountResponseDTO;
 import com.kvothe.agregadorinvestimentos.dto.UserDTO;
+import com.kvothe.agregadorinvestimentos.dto.UserResponseDTO;
 import com.kvothe.agregadorinvestimentos.entity.Account;
 import com.kvothe.agregadorinvestimentos.entity.BillingAddress;
 import com.kvothe.agregadorinvestimentos.entity.User;
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getUserById() {
+    public ResponseEntity<List<UserResponseDTO>> getUserById() {
         var users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
